@@ -2,7 +2,7 @@ require "rigger/connection_set"
 require "rigger/server_resolver"
 
 module Rigger
-  class TaskExecutor
+  class TaskExecutionService
     def initialize(server_resolver   = ServerResolver.new,
                    execution_context = ExecutionContext.new)
       @server_resolver   = server_resolver
