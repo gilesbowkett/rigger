@@ -7,6 +7,7 @@ module Rigger
     def initialize(config,
                    server_resolver  = ServerResolver.new(config),
                    executor_factory = TaskExecutor)
+      @config           = config
       @server_resolver  = server_resolver
       @executor_factory = executor_factory
     end
