@@ -1,9 +1,11 @@
 require "rigger/connection_set"
 require "rigger/server_resolver"
+require "rigger/task_executor"
 
 module Rigger
   class TaskExecutionService
-    def initialize(server_resolver  = ServerResolver.new,
+    def initialize(config,
+                   server_resolver  = ServerResolver.new(config),
                    executor_factory = TaskExecutor)
       @server_resolver  = server_resolver
       @executor_factory = executor_factory
@@ -20,8 +22,8 @@ module Rigger
     end
 
     private
-      def execut(task, servers)
-        @executor_factory.new(task, servers.call
+      def execute(task, servers)
+        @executor_factory.new(task, servers).call
       end
   end
 end

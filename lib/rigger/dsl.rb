@@ -23,8 +23,17 @@ module Rigger
       @tasks << @task_factory.new(name, options, block)
     end
 
-    def load_file(filename)
-      instance_eval(@file.read(filename))
+    def load_from_file(filename)
+      instance_eval(@file.read(filename), filename)
+    end
+
+    def locate_task(name)
+      @tasks.detect { |t| t.name == name.to_sym } || missing_task(name)
+    end
+
+    protected
+    def missing_task(name)
+      raise "Can't find a task called #{name}."
     end
   end
 end

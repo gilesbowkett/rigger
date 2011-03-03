@@ -1,0 +1,4 @@
+require "rigger"
+require "rigger/cli"
+
+Rigger::CLI.new.start
