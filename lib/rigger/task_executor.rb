@@ -3,8 +3,8 @@ require "net/ssh"
 module Rigger
   class TaskExecutor
     def initialize(task, servers)
-      @task    = task
-      @servers = servers
+      @task            = task
+      @current_servers = servers
     end
 
     def call
@@ -12,7 +12,7 @@ module Rigger
     end
 
     def run(command)
-      @servers.map do |server|
+      @current_servers.map do |server|
         Thread.new do
           exec = server.connection.exec!(command) do |channel, stream, data|
             data.split("\n").each { |line| puts "[#{server.connection_string} #{stream}]: #{line}" }
