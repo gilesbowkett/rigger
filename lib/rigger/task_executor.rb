@@ -13,11 +13,11 @@ module Rigger
 
     def run(command)
       @current_servers.map do |server|
+        puts "Running #{command} on #{server.connection_string}."
         Thread.new do
-          exec = server.connection.exec!(command) do |channel, stream, data|
+          server.connection.exec!(command) do |channel, stream, data|
             data.split("\n").each { |line| puts "[#{server.connection_string} #{stream}]: #{line}" }
           end
-          puts(exec.inspect)
         end
       end.each { |t| t.join }
     end
