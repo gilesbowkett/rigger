@@ -1,3 +1,6 @@
+require "rigger/task"
+require "rigger/server"
+
 module Rigger
   class DSL
     attr_reader :tasks, :servers
