@@ -47,6 +47,10 @@ module Rigger
       @vars[name.to_s] || missing_var(name)
     end
 
+    def fetch(name, default)
+      @vars.fetch(name.to_s, default)
+    end
+
     protected
     def missing_task(name)
       raise "Can't find a task called #{name}."

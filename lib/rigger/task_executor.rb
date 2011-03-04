@@ -57,6 +57,10 @@ module Rigger
       @config.set(name, value)
     end
 
+    def fetch(name, default)
+      @config.fetch(name, default)
+    end
+
     protected
       def execute(command, servers)
         puts "  * executing `#{command}`"
