@@ -55,7 +55,7 @@ module Rigger
       if failing_servers.empty?
         puts "  * command finished"
       else
-        raise "Command `#{command}` failed on #{failing_servers.map { |ch| ch[:host] }.inspect}."
+        raise CommandError, "Command `#{command}` failed on #{failing_servers.map { |ch| ch[:host] }.inspect}."
       end
     end
 
