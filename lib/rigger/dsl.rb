@@ -8,11 +8,18 @@ module Rigger
     def initialize(server_factory = Server,
                    task_factory   = Task,
                    file           = File)
-      @server_factory = server_factory
-      @task_factory   = task_factory
-      @file           = file
-      @tasks          = []
-      @servers        = []
+      @server_factory    = server_factory
+      @task_factory      = task_factory
+      @file              = file
+      @tasks             = []
+      @servers           = []
+      @current_namespace = []
+    end
+
+    def namespace(name, &block)
+      @current_namespace << name
+      yield
+      @current_namespace.pop
     end
 
     def server(role, host, options = {})
@@ -20,7 +27,7 @@ module Rigger
     end
 
     def task(name, options = {}, &block)
-      @tasks << @task_factory.new(name, options, block)
+      @tasks << @task_factory.new((@current_namespace + [name]).join(":"), options, block)
     end
 
     def load_from_file(filename)
@@ -28,7 +35,7 @@ module Rigger
     end
 
     def locate_task(name)
-      @tasks.detect { |t| t.name == name.to_sym } || missing_task(name)
+      @tasks.detect { |t| t.name == name } || missing_task(name)
     end
 
     protected
