@@ -14,14 +14,49 @@ module Rigger
     end
 
     def run(command)
-      @current_servers.map do |server|
-        puts "Running #{command} on #{server.connection_string}."
-        Thread.new do
-          server.connection.exec!(command) do |channel, stream, data|
-            data.split("\n").each { |line| puts "[#{server.connection_string} #{stream}]: #{line}" }
+      puts "  * executing `#{command}`"
+      puts "    servers: #{@current_servers.map { |s| s.connection_string }.inspect}"
+      channels = @current_servers.map do |server|
+        puts "    [#{server.connection_string}] executing command"
+        server.connection.open_channel do |ch|
+          ch.exec(command) do |ch, success|
+            ch[:host] = server.connection_string
+
+            ch.on_data do |c, data|
+              data.split("\n").each do |line|
+                puts " ** [#{server.connection_string} :: stdout] #{line}"
+              end
+            end
+
+            ch.on_extended_data do |c, type, data|
+              data.split("\n").each do |line|
+                puts " ** [#{server.connection_string} :: stderr] #{line}"
+              end
+            end
+
+            ch.on_request("exit-status") do |ch, data|
+              ch[:status] = data.read_long
+            end
+
+            ch.on_close do |ch|
+              ch[:closed] = true
+            end
           end
         end
-      end.each { |t| t.join }
+      end
+
+      threads = @current_servers.map { |server| Thread.new { server.connection.loop }  }
+
+      loop do
+        break if threads.all? { |t| !t.alive? }
+      end
+
+      failing_servers = channels.select { |ch| ch[:status] != 0 }
+      if failing_servers.empty?
+        puts "  * command finished"
+      else
+        raise "Command `#{command}` failed on #{failing_servers.map { |ch| ch[:host] }.inspect}."
+      end
     end
 
     def run_task(task_name)

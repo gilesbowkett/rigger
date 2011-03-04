@@ -15,6 +15,8 @@ module Rigger
     def call(task_name)
       task    = @config.locate_task(task_name)
       servers = @server_resolver.call(task)
+      
+      puts "  * executing '#{task_name}'"
 
       if task.options[:serial]
         servers.each { |s| execute(task, [s]) }
