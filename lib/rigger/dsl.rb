@@ -53,7 +53,7 @@ module Rigger
     end
 
     def missing_var(name)
-      raise "Can't find a variable named #{var}."
+      raise "Can't find a variable named #{name}."
     end
   end
 end
