@@ -13,7 +13,7 @@ module Rigger
     end
 
     def call(task)
-      servers  = @server_resolver.call(task)
+      servers = @server_resolver.call(task)
 
       if task.options[:serial]
         servers.each { |s| execute(task, [s]) }
