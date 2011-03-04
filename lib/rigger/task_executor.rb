@@ -2,9 +2,10 @@ require "net/ssh"
 
 module Rigger
   class TaskExecutor
-    def initialize(task, servers)
-      @task            = task
-      @current_servers = servers
+    def initialize(task, servers, execution_service)
+      @task              = task
+      @current_servers   = servers
+      @execution_service = execution_service
     end
 
     def call
@@ -20,6 +21,10 @@ module Rigger
           end
         end
       end.each { |t| t.join }
+    end
+
+    def run_task(task_name)
+      @execution_service.call(task_name)
     end
   end
 end

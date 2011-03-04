@@ -12,7 +12,8 @@ module Rigger
       @executor_factory = executor_factory
     end
 
-    def call(task)
+    def call(task_name)
+      task    = @config.locate_task(task_name)
       servers = @server_resolver.call(task)
 
       if task.options[:serial]
@@ -24,7 +25,7 @@ module Rigger
 
     private
       def execute(task, servers)
-        @executor_factory.new(task, servers).call
+        @executor_factory.new(task, servers, self).call
       end
   end
 end

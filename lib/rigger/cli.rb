@@ -17,8 +17,8 @@ module Rigger
       @config.load_from_file(@config_file)
       executor     = @task_execution_service_factory.new(@config)
 
-      @args.each do |arg|
-        executor.call(@config.locate_task(arg))
+      @args.each do |task_name|
+        executor.call(task_name)
       end
     end
 
