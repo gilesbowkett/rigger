@@ -1,4 +1,5 @@
 require "spec_helper"
+require "rigger"
 require "rigger/server_resolver"
 
 describe "Rigger::ServerResolver" do
@@ -40,6 +41,16 @@ describe "Rigger::ServerResolver" do
 
     it "returns all the servers matching that role" do
       @resolver.call(@task).should == [@server3]
+    end
+  end
+
+  describe "when no servers match" do
+    before do
+      @task = stub("Config", :options => {:only => {:FUCK => true}})
+    end
+
+    it "raises an error" do
+      lambda { @resolver.call(@task) }.should raise_error(Rigger::NoMatchingServers)
     end
   end
 end
