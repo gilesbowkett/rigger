@@ -53,7 +53,7 @@ module Rigger
 
     def run_locally(command)
       puts "  * executing `#{command}` locally"
-      POpen4.popen4(command) do |stdout, stderr, stdin, pid|
+      status = POpen4.popen4(command) do |stdout, stderr, stdin, pid|
         stdout.each_line do |line|
           puts " ** [locally :: stdout] #{line}"
         end
@@ -62,7 +62,12 @@ module Rigger
           puts " ** [locally :: stderr] #{line}"
         end
       end
-      puts "  * command finished"
+
+      if status && status.exitstatus == 0
+        puts "  * command finished"
+      else
+        raise CommandError, "Local command `#{command}` failed."
+      end
     end
 
     def get(name)
