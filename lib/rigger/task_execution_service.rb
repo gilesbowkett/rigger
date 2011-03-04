@@ -25,7 +25,7 @@ module Rigger
 
     private
       def execute(task, servers)
-        @executor_factory.new(task, servers, self).call
+        @executor_factory.new(task, servers, self, @config).call
       end
   end
 end

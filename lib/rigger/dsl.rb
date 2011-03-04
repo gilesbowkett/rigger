@@ -14,6 +14,7 @@ module Rigger
       @tasks             = []
       @servers           = []
       @current_namespace = []
+      @vars              = {}
     end
 
     def namespace(name, &block)
@@ -38,9 +39,21 @@ module Rigger
       @tasks.detect { |t| t.name == name } || missing_task(name)
     end
 
+    def set(name, value)
+      @vars[name.to_s] = value
+    end
+
+    def get(name)
+      @vars[name.to_s] || missing_var(name)
+    end
+
     protected
     def missing_task(name)
       raise "Can't find a task called #{name}."
+    end
+
+    def missing_var(name)
+      raise "Can't find a variable named #{var}."
     end
   end
 end
