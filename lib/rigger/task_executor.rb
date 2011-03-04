@@ -1,7 +1,9 @@
 require "net/ssh"
+require "popen4"
 
 module Rigger
   class TaskExecutor
+
     def initialize(task, servers, execution_service, config)
       @task              = task
       @current_servers   = servers
@@ -51,8 +53,14 @@ module Rigger
 
     def run_locally(command)
       puts "  * executing `#{command}` locally"
-      `#{command}`.split("\n").each do |line|
-        puts " ** [locally :: stdout] #{line}"
+      POpen4.popen4(command) do |stdout, stderr, stdin, pid|
+        stdout.each_line do |line|
+          puts " ** [locally :: stdout] #{line}"
+        end
+
+        stderr.each_line do |line|
+          puts " ** [locally :: stderr] #{line}"
+        end
       end
       puts "  * command finished"
     end

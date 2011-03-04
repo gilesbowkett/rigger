@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
 gem "net-ssh-multi", "1.0.1"
+gem "popen4", "0.1.2"
 
 group :development do
   gem "rspec", "~> 2.3.0"

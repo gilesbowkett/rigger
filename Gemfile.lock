@@ -1,6 +1,7 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    Platform (0.4.0)
     bourne (1.0)
       mocha (= 0.9.8)
     diff-lcs (1.1.2)
@@ -17,6 +18,10 @@ GEM
     net-ssh-multi (1.0.1)
       net-ssh (>= 1.99.2)
       net-ssh-gateway (>= 0.99.0)
+    open4 (0.9.6)
+    popen4 (0.1.2)
+      Platform (>= 0.4.0)
+      open4 (>= 0.4.0)
     rake (0.8.7)
     rcov (0.9.9)
     rspec (2.3.0)
@@ -37,5 +42,6 @@ DEPENDENCIES
   jeweler (~> 1.5.2)
   mocha (>= 0.9.8)
   net-ssh-multi (= 1.0.1)
+  popen4 (= 0.1.2)
   rcov
   rspec (~> 2.3.0)
