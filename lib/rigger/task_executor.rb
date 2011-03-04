@@ -49,6 +49,14 @@ module Rigger
       @execution_service.call(task_name)
     end
 
+    def run_locally(command)
+      puts "  * executing `#{command}` locally"
+      `#{command}`.split("\n").each do |line|
+        puts " ** [locally :: stdout] #{line}"
+      end
+      puts "  * command finished"
+    end
+
     def get(name)
       @config.get(name)
     end
