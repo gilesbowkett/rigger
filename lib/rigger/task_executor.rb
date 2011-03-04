@@ -14,48 +14,34 @@ module Rigger
     end
 
     def run(command)
-      puts "  * executing `#{command}`"
-      puts "    servers: #{@current_servers.map { |s| s.connection_string }.inspect}"
-      channels = @current_servers.map do |server|
-        puts "    [#{server.connection_string}] executing command"
-        server.connection.open_channel do |ch|
-          ch.exec(command) do |ch, success|
-            ch[:host] = server.connection_string
+      execute(command, @current_servers) do |ch|
+        ch.on_data do |c, data|
+          data.split("\n").each do |line|
+            puts " ** [#{ch[:host]} :: stdout] #{line}"
+          end
+        end
 
-            ch.on_data do |c, data|
-              data.split("\n").each do |line|
-                puts " ** [#{server.connection_string} :: stdout] #{line}"
-              end
-            end
-
-            ch.on_extended_data do |c, type, data|
-              data.split("\n").each do |line|
-                puts " ** [#{server.connection_string} :: stderr] #{line}"
-              end
-            end
-
-            ch.on_request("exit-status") do |ch, data|
-              ch[:status] = data.read_long
-            end
-
-            ch.on_close do |ch|
-              ch[:closed] = true
-            end
+        ch.on_extended_data do |c, type, data|
+          data.split("\n").each do |line|
+            puts " ** [#{ch[:host]} :: stderr] #{line}"
           end
         end
       end
+    end
 
-      threads = @current_servers.map { |server| Thread.new { server.connection.loop }  }
+    def capture(command)
+      "".tap do |captured|
+        execute(command, [@current_servers.first]) do |ch|
+          ch.on_data do |c, data|
+            captured << data
+          end
 
-      loop do
-        break if threads.all? { |t| !t.alive? }
-      end
-
-      failing_servers = channels.select { |ch| ch[:status] != 0 }
-      if failing_servers.empty?
-        puts "  * command finished"
-      else
-        raise CommandError, "Command `#{command}` failed on #{failing_servers.map { |ch| ch[:host] }.inspect}."
+          ch.on_extended_data do |c, type, data|
+            data.split("\n").each do |line|
+              puts " ** [#{server.connection_string} :: stderr] #{line}"
+            end
+          end
+        end
       end
     end
 
@@ -70,5 +56,42 @@ module Rigger
     def set(name, value)
       @config.set(name, value)
     end
-  end
+
+    protected
+      def execute(command, servers)
+        puts "  * executing `#{command}`"
+        puts "    servers: #{servers.map { |s| s.connection_string }.inspect}"
+        channels = servers.map do |server|
+          puts "    [#{server.connection_string}] executing command"
+          server.connection.open_channel do |ch|
+            ch.exec(command) do |ch, success|
+              ch[:host] = server.connection_string
+
+              yield ch
+
+              ch.on_request("exit-status") do |ch, data|
+                ch[:status] = data.read_long
+              end
+
+              ch.on_close do |ch|
+                ch[:closed] = true
+              end
+            end
+          end
+        end
+
+        threads = servers.map { |server| Thread.new { server.connection.loop }  }
+
+        loop do
+          break if threads.all? { |t| !t.alive? }
+        end
+
+        failing_servers = channels.select { |ch| ch[:status] != 0 }
+        if failing_servers.empty?
+          puts "  * command finished"
+        else
+          raise CommandError, "Command `#{command}` failed on #{failing_servers.map { |ch| ch[:host] }.inspect}."
+        end
+      end
+    end
 end
