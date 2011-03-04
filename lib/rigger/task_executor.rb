@@ -31,5 +31,9 @@ module Rigger
     def get(name)
       @config.get(name)
     end
+
+    def set(name, value)
+      @config.set(name, value)
+    end
   end
 end
