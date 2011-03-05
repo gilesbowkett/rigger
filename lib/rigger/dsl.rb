@@ -11,7 +11,7 @@ module Rigger
       @server_factory    = server_factory
       @task_factory      = task_factory
       @file              = file
-      @tasks             = []
+      @tasks             = {}
       @servers           = []
       @current_namespace = []
       @vars              = {}
@@ -28,7 +28,8 @@ module Rigger
     end
 
     def task(name, options = {}, &block)
-      @tasks << @task_factory.new((@current_namespace + [name]).join(":"), options, block)
+      full_name = (@current_namespace + [name]).join(":")
+      @tasks[full_name] = @task_factory.new(full_name, options, block)
     end
 
     def load_from_file(filename)
@@ -36,7 +37,7 @@ module Rigger
     end
 
     def locate_task(name)
-      @tasks.detect { |t| t.name == name } || missing_task(name)
+      @tasks[name.to_s]
     end
 
     def set(name, value)
