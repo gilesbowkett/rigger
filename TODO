@@ -1,0 +1,1 @@
+* Make it easier to load recipes from installed gems or other files by hooking in to $LOAD_PATH.
