@@ -14,8 +14,8 @@ module Rigger
 
     def start
       options = parse_options
-      load_config_file
       load_builtin_recipes
+      load_config_file
 
       if options[:display_tasks]
         display_tasks
