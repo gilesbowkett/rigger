@@ -15,6 +15,7 @@ module Rigger
     def start
       options = parse_options
       load_config_file
+      load_builtin_recipes
 
       if options[:display_tasks]
         display_tasks
@@ -32,7 +33,7 @@ module Rigger
 
       def load_builtin_recipes
         Dir[File.dirname(__FILE__) + "/recipes/**/*.rb"].each do |f|
-          load_from_file f
+          @config.load_from_file f
         end
       end
 
