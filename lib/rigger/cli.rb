@@ -30,6 +30,12 @@ module Rigger
         @config.load_from_file(@config_file)
       end
 
+      def load_builtin_recipes
+        Dir[File.dirname(__FILE__) + "/recipes/**/*.rb"].each do |f|
+          load_from_file f
+        end
+      end
+
       def locate_config_file
         location = possible_config_locations.detect { |l| File.exist?(l) }
         location || raise_missing_config_file
