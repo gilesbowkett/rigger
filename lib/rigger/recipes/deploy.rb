@@ -34,7 +34,7 @@ namespace :deploy do
   end
 
   task :rollback do
-    releases = capture("cd #{releases_path} && ls -x").strip.split.sort
+    releases = capture("cd #{get(:releases_path)} && ls -x").strip.split.sort
     run "rm -rf #{get(:release_path)}; true"
 
     if releases.length > 1
