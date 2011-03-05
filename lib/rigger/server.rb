@@ -4,13 +4,12 @@ module Rigger
       @connection ||= Net::SSH.start(host, user)
     end
 
-    protected
-      def host
-        connection_string.split("@").last
-      end
+    def host
+      connection_string.split("@").last
+    end
 
-      def user
-        connection_string.split("@").first
-      end
+    def user
+      connection_string.split("@").first
+    end
   end
 end
