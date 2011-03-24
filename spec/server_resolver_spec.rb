@@ -49,8 +49,8 @@ describe "Rigger::ServerResolver" do
       @task = stub("Config", :options => {:only => {:FUCK => true}})
     end
 
-    it "raises an error" do
-      lambda { @resolver.call(@task) }.should raise_error(Rigger::NoMatchingServers)
+    it "returns []" do
+      @resolver.call(@task).should == []
     end
   end
 end

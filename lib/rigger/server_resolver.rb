@@ -11,9 +11,7 @@ module Rigger
       role_servers = roles.empty? ? @config.servers : from_roles(roles)
       only_servers = only.empty?  ? @config.servers : from_only(only)
 
-      (role_servers & only_servers).tap do |matching|
-        assert_some_servers_match(task, matching)
-      end
+      (role_servers & only_servers)
     end
 
     protected
@@ -30,12 +28,6 @@ module Rigger
           only.all? do |key, value|
             server.options[key] == value
           end
-        end
-      end
-
-      def assert_some_servers_match(task, servers)
-        if servers.empty?
-          raise NoMatchingServers, "No servers match #{task.name}."
         end
       end
   end
