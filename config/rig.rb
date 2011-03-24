@@ -10,7 +10,7 @@ namespace :fuck do
     puts d.inspect
   end
 
-  task :you do
-    run "ls asdfbbbb"
+  task :you, :single => true do
+    run "ls -la"
   end
 end

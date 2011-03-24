@@ -1,15 +1,16 @@
 require "rigger/connection_set"
 require "rigger/server_resolver"
 require "rigger/task_executor"
+require "rigger/execution_strategy"
 
 module Rigger
   class TaskExecutionService
     def initialize(config,
-                   server_resolver  = ServerResolver.new(config),
-                   executor_factory = TaskExecutor)
-      @config           = config
-      @server_resolver  = server_resolver
-      @executor_factory = executor_factory
+                   server_resolver             = ServerResolver.new(config),
+                   execution_strategy_selector = ExecutionStrategy::Selector.new)
+      @config                      = config
+      @server_resolver             = server_resolver
+      @execution_strategy_selector = execution_strategy_selector
     end
 
     def call(task_name)
@@ -18,16 +19,8 @@ module Rigger
       
       puts "  * executing '#{task_name}'"
 
-      if task.options[:serial]
-        servers.each { |s| execute(task, [s]) }
-      else
-        execute(task, servers)
-      end
+      strategy = @execution_strategy_selector.call(task)
+      strategy.call(task, servers, @config, self)
     end
-
-    private
-      def execute(task, servers)
-        @executor_factory.new(task, servers, self, @config).call
-      end
   end
 end
