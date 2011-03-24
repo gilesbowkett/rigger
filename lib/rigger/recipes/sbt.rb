@@ -10,7 +10,8 @@ namespace :sbt do
     set :sbt_name, props["project.name"]
     set :sbt_version, props["project.version"]
     set :sbt_build_version, props["build.scala.versions"]
-    set :sbt_assembly_path, Dir.pwd + "/target/scala_#{get(:sbt_build_version)}/#{get(:sbt_name)}-assembly-#{get(:sbt_version)}.jar"
+    set :sbt_assembly_filename, "#{get(:sbt_name)}-assembly-#{get(:sbt_version)}.jar"
+    set :sbt_assembly_path, Dir.pwd + "/target/scala_#{get(:sbt_build_version)}/#{get(:sbt_assembly_filename)}"
   end
 
   task :update_code do

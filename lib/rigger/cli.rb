@@ -13,6 +13,7 @@ module Rigger
     end
 
     def start
+      @config = @dsl.new
       options = parse_options
       load_builtin_recipes
       load_config_file
@@ -27,7 +28,6 @@ module Rigger
     protected
       def load_config_file
         @config_file = locate_config_file
-        @config      = @dsl.new
         @config.load_from_file(@config_file)
       end
 
