@@ -6,7 +6,7 @@ module Rigger
       end
 
       def call(task, servers, config, execution_service)
-        @executor_factory.new(task, servers, config, execution_service).call
+        @executor_factory.new(task, servers, execution_service, config).call
       end
     end
 
