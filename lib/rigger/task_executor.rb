@@ -20,12 +20,14 @@ module Rigger
         ch.on_data do |c, data|
           data.split("\n").each do |line|
             puts " ** [#{ch[:host]} :: stdout] #{line}"
+            $stdout.flush
           end
         end
 
         ch.on_extended_data do |c, type, data|
           data.split("\n").each do |line|
             puts " ** [#{ch[:host]} :: stderr] #{line}"
+            $stderr.flush
           end
         end
       end
@@ -41,6 +43,7 @@ module Rigger
           ch.on_extended_data do |c, type, data|
             data.split("\n").each do |line|
               puts " ** [#{server.connection_string} :: stderr] #{line}"
+              $stderr.flush
             end
           end
         end
