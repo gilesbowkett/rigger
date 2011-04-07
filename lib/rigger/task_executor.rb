@@ -1,8 +1,39 @@
 require "net/ssh"
+require "net/sftp"
 require "popen4"
 
 module Rigger
   class TaskExecutor
+      class SFTPTransferWrapper
+        attr_reader :operation
+
+        def initialize(session, &callback)
+          @sftp = Net::SFTP::Session.new(session)  do |sftp|
+            @operation = callback.call(sftp)
+          end
+        end
+
+        def loop
+          @sftp.connect!
+          @sftp.loop
+        end
+
+        def active?
+          @operation.nil? || @operation.active?
+        end
+
+        def [](key)
+          @operation[key]
+        end
+
+        def []=(key, value)
+          @operation[key] = value
+        end
+
+        def abort!
+          @operation.abort!
+        end
+      end
 
     def initialize(task, servers, execution_service, config)
       @task              = task
@@ -83,6 +114,45 @@ module Rigger
 
     def fetch(name, default)
       @config.fetch(name, default)
+    end
+
+    def put(data, path)
+      io       = StringIO.new(data.respond_to?(:read) ? data.read : data)
+      servers  = @current_servers
+      channels = servers.map do |s|
+        callback = Proc.new do |channel, name, sent, total|
+          puts "[#{channel[:host]}] #{name}" if sent == 0
+        end
+
+        SFTPTransferWrapper.new(s.connection) do |sftp|
+          sftp.upload(io, path, {}, &callback)
+        end
+      end
+
+      puts "  * transerring data to #{path}"
+
+      failing_servers = []
+      errors = []
+      threads = servers.map do |server| 
+        Thread.new do
+          begin
+            server.connection.loop 
+          rescue Net::SFTP::StatusException => e
+            failing_servers << server.connection_string
+            errors << e.message
+          end
+        end
+      end
+
+      loop do
+        break if channels.all? { |ch| !ch.active? }
+      end
+
+      if !failing_servers.empty?
+        raise CommandError, "Upload failed on #{failing_servers.inspect} with #{errors.join(", ")}."
+      end
+
+      puts "  * finished"
     end
 
     protected

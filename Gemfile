@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
 gem "net-ssh-multi", "1.0.1"
+gem "net-sftp", "2.0.5"
 gem "popen4", "0.1.2"
 
 group :development do

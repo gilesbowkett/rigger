@@ -1,3 +1,5 @@
+require "stringio"
+
 set :current_path, "/var/www/fetlife"
 server :app, "james@jamesgolick.com"
 server :db, "fetlife@app1.dal.fetlife"
@@ -11,6 +13,7 @@ namespace :fuck do
   end
 
   task :you, :single => true do
+    put "config/rig.rb", "/asdf.txt"
     run "ls -la"
   end
 end
