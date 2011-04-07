@@ -13,11 +13,6 @@ module Rigger
           end
         end
 
-        def loop
-          @sftp.connect!
-          @sftp.loop
-        end
-
         def active?
           @operation.nil? || @operation.active?
         end
@@ -125,31 +120,35 @@ module Rigger
         end
 
         SFTPTransferWrapper.new(s.connection) do |sftp|
-          sftp.upload(io, path, {}, &callback)
+          sftp.upload(io, path, {}) do |status, we|
+            if status == :finish
+              sftp.close_channel
+            end
+          end
         end
       end
 
       puts "  * transerring data to #{path}"
 
+      connections = servers
+
       failing_servers = []
-      errors = []
-      threads = servers.map do |server| 
-        Thread.new do
+      errors          = []
+
+      loop do
+        connections.delete_if do |server|
           begin
-            server.connection.loop 
+            !server.connection.process(0.1) { |s| s.busy? }
           rescue Net::SFTP::StatusException => e
-            failing_servers << server.connection_string
+            failing_servers << server
             errors << e.message
           end
         end
-      end
-
-      loop do
-        break if channels.all? { |ch| !ch.active? }
+        break if connections.empty?
       end
 
       if !failing_servers.empty?
-        raise CommandError, "Upload failed on #{failing_servers.inspect} with #{errors.join(", ")}."
+        raise CommandError, "Upload failed on #{failing_servers.map { |s| s.connection_string }.inspect} with #{errors.join(", ")}."
       end
 
       puts "  * finished"
@@ -178,10 +177,11 @@ module Rigger
           end
         end
 
-        threads = servers.map { |server| Thread.new { server.connection.loop }  }
+        connections = servers.map { |s| s.connection }
 
         loop do
-          break if channels.all? { |ch| ch[:closed] }
+          connections.delete_if { |ssh| !ssh.process(0.1) { |s| s.busy? } }
+          break if connections.empty?
         end
 
         failing_servers = channels.select { |ch| ch[:status] != 0 }
