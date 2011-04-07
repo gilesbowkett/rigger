@@ -113,7 +113,7 @@ module Rigger
 
     def put(data, path)
       io       = StringIO.new(data.respond_to?(:read) ? data.read : data)
-      servers  = @current_servers
+      servers  = @current_servers.dup
       channels = servers.map do |s|
         callback = Proc.new do |channel, name, sent, total|
           puts "[#{channel[:host]}] #{name}" if sent == 0
@@ -130,7 +130,7 @@ module Rigger
 
       puts "  * transerring data to #{path}"
 
-      connections = servers
+      connections = servers.dup
 
       failing_servers = []
       errors          = []
