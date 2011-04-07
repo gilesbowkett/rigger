@@ -6,14 +6,16 @@ server :db, "fetlife@app1.dal.fetlife"
 
 namespace :fuck do
   task :test, :depends => [] do
-    run_task "fuck:you"
-    run_locally "ls -abgjh"
-    d = run "ls"
-    puts d.inspect
+    #run_task "fuck:you"
+    run "ls -la"
   end
 
   task :you, :single => true do
     put "config/rig.rb", "/home/james/asdf.txt"
     run "ls -la"
+  end
+
+  task :this do
+    run "ls -lah"
   end
 end
