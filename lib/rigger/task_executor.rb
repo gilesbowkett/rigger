@@ -112,7 +112,6 @@ module Rigger
     end
 
     def put(data, path)
-      io       = StringIO.new(data.respond_to?(:read) ? data.read : data)
       servers  = @current_servers.dup
       channels = servers.map do |s|
         callback = Proc.new do |channel, name, sent, total|
@@ -120,7 +119,8 @@ module Rigger
         end
 
         SFTPTransferWrapper.new(s.connection) do |sftp|
-          sftp.upload(io.dup, path, {}) do |status, we|
+          io = StringIO.new(data.respond_to?(:read) ? data.read : data)
+          sftp.upload(io, path, {}) do |status, we|
             if status == :finish
               sftp.close_channel
             end
