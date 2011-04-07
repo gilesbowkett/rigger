@@ -120,7 +120,7 @@ module Rigger
         end
 
         SFTPTransferWrapper.new(s.connection) do |sftp|
-          sftp.upload(io, path, {}) do |status, we|
+          sftp.upload(io.dup, path, {}) do |status, we|
             if status == :finish
               sftp.close_channel
             end
