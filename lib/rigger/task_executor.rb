@@ -8,7 +8,7 @@ module Rigger
         attr_reader :operation
 
         def initialize(session, &callback)
-          @sftp = Net::SFTP::Session.new(session)  do |sftp|
+          @sftp = session.sftp(false).connect  do |sftp|
             @operation = callback.call(sftp)
           end
         end

@@ -13,7 +13,7 @@ namespace :fuck do
   end
 
   task :you, :single => true do
-    put "config/rig.rb", "/asdf.txt"
+    put "config/rig.rb", "/home/james/asdf.txt"
     run "ls -la"
   end
 end
