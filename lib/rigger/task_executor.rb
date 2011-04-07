@@ -181,7 +181,7 @@ module Rigger
         threads = servers.map { |server| Thread.new { server.connection.loop }  }
 
         loop do
-          break if threads.all? { |t| !t.alive? }
+          break if channels.all? { |ch| ch[:closed] }
         end
 
         failing_servers = channels.select { |ch| ch[:status] != 0 }
