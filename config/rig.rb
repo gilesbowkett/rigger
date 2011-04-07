@@ -11,6 +11,7 @@ namespace :fuck do
   end
 
   task :you, :single => true do
+    run "mkdir -p /home/james/fuckit"
     put "config/rig.rb", "/home/james/asdf.txt"
     run "ls -la"
   end
