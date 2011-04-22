@@ -2,7 +2,7 @@ namespace :service do
   task :package do
     set :bundle_name, "#{get(:application)}-#{get(:sbt_version)}.tar.gz"
     set :bundle_path, "target/#{get(:bundle_name)}"
-    run_locally "tar -czv --file=#{get(:bundle_path)} config cookbooks roles -C target/scala_2.8.0 #{get(:sbt_assembly_filename)}"
+    run_locally "tar -czv --file=#{get(:bundle_path)} config cookbooks roles -C target/#{get(:sbt_build_version)} #{get(:sbt_assembly_filename)}"
   end
 
   task :update_code do
