@@ -1,8 +1,8 @@
 require "stringio"
 
-set :current_path, "/var/www/fetlife"
-server :app, "james@jamesgolick.com"
-server :db, "fetlife@app1.dal.fetlife"
+set :current_path, "/var/www/yr_app_home"
+server :app, "app@server"
+server :db, "db@server"
 
 namespace :fuck do
   task :test, :depends => [] do
